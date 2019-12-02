@@ -8,6 +8,7 @@ public class Agenda {
 
     public void menu(){
         listaContactos = new ArrayList<Contacto>();
+        //Agrega las categorias iniciales.
         categoryList.add("Familia");
         categoryList.add("Amigos");
         categoryList.add("Trabajo");
@@ -26,14 +27,18 @@ public class Agenda {
                 case 1:
                     System.out.println("1. Ver todos.");
                     System.out.println("2. Ver categorias. ");
-                    System.out.println("Seleccione una opcion 1-2");
-                    int opcionSegundaria = leerEntero(2);
+                    System.out.println("3. Ver favoritos");
+                    System.out.println("Seleccione una opcion 1-3");
+                    int opcionSegundaria = leerEntero(3);
                     switch (opcionSegundaria){
                         case 1:
                             verContactos();
                             break;
                         case 2:
                             verCategorias();
+                            break;
+                        case 3:
+                            verFavoritos();
                             break;
                     }
                     break;
@@ -44,7 +49,18 @@ public class Agenda {
                     borrarContacto();
                     break;
                 case 4:
-                    modificarContacto();
+                    System.out.println("1. Modificar contacto");
+                    System.out.println("2. Agregar un contacto a favoritos");
+                    System.out.println("Seleccione una opcion 1-2");
+                    opcionSegundaria = leerEntero(2);
+                    switch(opcionSegundaria){
+                        case 1:
+                            modificarContacto();
+                            break;
+                        case 2:
+                            hacerFavorito();
+                            break;
+                    }
                     break;
             }
         }while(opcion !=0);
@@ -55,7 +71,7 @@ public class Agenda {
         else {
             mostrarContactos();
             System.out.println("Seleccione el contacto que desea ver 1 -" + listaContactos.size());
-            int ver = leerEntero(listaContactos.size()) - 1;
+            int ver = leerEntero(listaContactos.size()) - 1;    //Reduce en 1 porque los arraylist empiezan en 0
             System.out.println("Informacion de " + listaContactos.get(ver).getName());
             informacionDeContacto(ver);
         }
@@ -68,20 +84,49 @@ public class Agenda {
             for (int i = 0; i < categoryList.size(); i++)
                 System.out.println(i + 1 + ". " + categoryList.get(i));
             System.out.println("Seleccione la categoria que desea ver 1-" + categoryList.size());
-            int categoryIndex = leerEntero(categoryList.size());
-            categoryIndex--;
+            int categoryIndex = leerEntero(categoryList.size()) - 1;
             System.out.println("Los contactos de la categoria " + categoryList.get(categoryIndex) + " son: ");
+            int contadorCategoria = 0;
             for (int i = 0; i < listaContactos.size(); i++) {
                 if (categoryList.get(categoryIndex) == listaContactos.get(i).getCategory()) {
                     System.out.println(i + 1 + ". " + listaContactos.get(i).getName() + " " + listaContactos.get(i).getLastName() +
                             "\"" + listaContactos.get(i).getNickName() + "\".");
+                    contadorCategoria++;
                 }
             }
-            System.out.println("Seleccione el contacto que desea ver 1 -" + listaContactos.size());
-            int ver = leerEntero(listaContactos.size()) - 1;
-            if(categoryList.get(categoryIndex) == listaContactos.get(ver).getCategory()){
-            System.out.println("Informacion de " + listaContactos.get(ver).getName());
-            informacionDeContacto(ver);
+            if(contadorCategoria == 0){
+                System.out.println("No hay contactos en esta categoria.");
+            }else {
+                System.out.println("Seleccione el contacto que desea ver 1 -" + listaContactos.size());
+                int ver = leerEntero(listaContactos.size()) - 1;
+                if (categoryList.get(categoryIndex) == listaContactos.get(ver).getCategory()) {
+                    System.out.println("Informacion de " + listaContactos.get(ver).getName());
+                    informacionDeContacto(ver);
+                } else
+                    System.out.println("Opcion invalida.");
+            }
+        }
+    }
+
+    public void verFavoritos(){
+        System.out.println("Sus contactos favoritos son: ");
+        int contadorFavoritos = 0;
+        for(int i = 0; i < listaContactos.size(); i++){
+            if(listaContactos.get(i).isFavorito()) {
+                System.out.println(i + 1 + ". " + listaContactos.get(i).getName() + " " + listaContactos.get(i).getLastName() +
+                        " \"" + listaContactos.get(i).getNickName() + "\".");
+                contadorFavoritos++;
+            }
+        }
+        if(contadorFavoritos == 0){
+            System.out.println("Usted no tiene contactos favoritos.\nPara hacer un contacto favorito vaya a la opcion [Modificar contacto]");
+        }else{
+            System.out.println("Seleccione el contacto que desea ver 1-" + listaContactos.size());
+            int ver = leerEntero(listaContactos.size());
+            ver--;
+            if(listaContactos.get(ver).isFavorito()){
+                System.out.println("Informacion de " + listaContactos.get(ver).getName());
+                informacionDeContacto(ver);
             }else
                 System.out.println("Opcion invalida.");
         }
@@ -135,7 +180,7 @@ public class Agenda {
             System.out.println("Seleccione el contacto que desea modificar 1-" + listaContactos.size());
             int modificar = leerEntero(listaContactos.size()) - 1;
             informacionDeContacto(modificar);
-            System.out.println("Seleccione el campo que desea modificar 1-6.\nPrecione 0 para modificar todo el contacto");
+            System.out.println("Seleccione el campo que desea modificar 1-6.\nPresione 0 para modificar todo el contacto");
             int campo = leerEntero(6);
             String nuevo;
             switch (campo) {
@@ -191,11 +236,32 @@ public class Agenda {
         }
     }
 
+    public void hacerFavorito(){
+        if(listaContactos.size() == 0) System.out.println("No tiene contactos almacenados.");
+        else {
+            mostrarContactos();
+            System.out.println("Seleccione el contacto que desea agregar a favoritos ");
+            int favorito = leerEntero(listaContactos.size())-1;
+            if(!listaContactos.get(favorito).isFavorito()){
+                listaContactos.get(favorito).setFavorito(true);
+                System.out.println(listaContactos.get(favorito).getName()+" fue agregado a favoritos.");
+            }else{
+                System.out.println(listaContactos.get(favorito).getName()+" ya es favorito, desea sacarlo de la lista? ");
+                System.out.println("1. Si \n2. No");
+                int confirmacion = leerEntero(2);
+                if(confirmacion == 1) {
+                    listaContactos.get(favorito).setFavorito(false);
+                    System.out.println(listaContactos.get(favorito).getName()+" ya no hace parte de favoritos. ");
+                }
+            }
+        }
+    }
+
     public void mostrarContactos(){
         System.out.println("Sus contactos son: ");
         for( int i = 0; i< listaContactos.size(); i++){
             System.out.println(i+1+". "+listaContactos.get(i).getName()+" "+listaContactos.get(i).getLastName()+
-                    "\""+ listaContactos.get(i).getNickName()+ "\".");
+                    " \""+ listaContactos.get(i).getNickName()+ "\".");
         }
     }
 
