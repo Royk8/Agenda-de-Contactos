@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class Contacto {
     private String name, lastName, nickName, email, category;
     private float telephone;
+    private boolean favorito;
     //private ArrayList<String> categoryList = new ArrayList();
 
 
@@ -64,5 +65,13 @@ public class Contacto {
 
     public void setTelephone(float telephone) {
         this.telephone = telephone;
+    }
+
+    public boolean isFavorito() {
+        return favorito;
+    }
+
+    public void setFavorito(boolean favorito) {
+        this.favorito = favorito;
     }
 }
